@@ -662,11 +662,15 @@ export class OptFrontend extends AbstractBaseFrontend {
   }
 
   // Open visualize.html with current state (reverse of openLiveModeUrl).
-  // index.html is the live build default; the visualize chunk is visualize.html.
+  // Webpack: index.html = live, visualize.html = visualize. Build the hash with BBQ
+  // from an empty base, then resolve visualize.html against the current page so the
+  // opened URL is always one absolute path + #state (never index.html#... for this action).
   openVisualizeUrl() {
     var myArgs = this.getAppState();
-    var urlStr = $.param.fragment('visualize.html', myArgs, 2 /* clobber all */);
-    window.open(urlStr);
+    var hashOnly = $.param.fragment('', myArgs, 2 /* clobber all */);
+    var target = new URL('visualize.html', window.location.href);
+    target.hash = hashOnly.charAt(0) === '#' ? hashOnly.slice(1) : hashOnly;
+    window.open(target.href);
     return false;
   }
 
