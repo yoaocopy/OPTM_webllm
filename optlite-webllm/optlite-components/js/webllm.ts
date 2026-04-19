@@ -109,13 +109,20 @@ engine.setInitProgressCallback(updateEngineInitProgressCallback);
 // Track if the local WebLLM engine has finished loading a model
 let isEngineReady = false;
 
+/** Reads #chat-temperature (local + API); fallback matches live.html default. */
+function getUiTemperature(): number {
+    const el = document.getElementById("chat-temperature") as HTMLInputElement | null;
+    const n = parseFloat((el?.value ?? "").trim() || "1");
+    return Number.isFinite(n) ? n : 1.0;
+}
+
 async function initializeWebLLMEngine() {
     document.getElementById("chat-stats").classList.add("hidden");
     document.getElementById("download-status").classList.remove("hidden");
     var modelSelect = document.getElementById("model-selection") as HTMLInputElement;
     selectedModel = modelSelect.value;
     const config = {
-        temperature: 1.0,
+        temperature: getUiTemperature(),
         top_p: 1,
         max_tokens: 512,
         stop: ["<|endoftext|>", "<|im_end|>"]
@@ -154,7 +161,7 @@ async function callOpenAIAPI(messages, onUpdate, onFinish, onError) {
                 model: API_CONFIG.model,
                 messages: messages,
                 stream: true,
-                temperature: parseFloat((document.getElementById("api-temperature") as HTMLInputElement)?.value || "0.5"),
+                temperature: getUiTemperature(),
                 top_p: 1,
                 // Constrain generation to avoid endless outputs
                 max_tokens: 512,
@@ -260,6 +267,7 @@ async function streamingGenerating(messages, onUpdate, onFinish, onError) {
         const completion = await engine.chat.completions.create({
             stream: true,
             messages,
+            temperature: getUiTemperature(),
             stream_options: { include_usage: true },
         });
         for await (const chunk of completion) {
@@ -626,9 +634,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Bind inputs for immediate effect
     bindAPIInputsImmediate();
 
-    // Bind temperature slider to update displayed value
-    const tempSlider = document.getElementById("api-temperature") as HTMLInputElement | null;
-    const tempValue = document.getElementById("temperature-value");
+    // Bind shared chat temperature slider (see live.html comment on #chat-temperature)
+    const tempSlider = document.getElementById("chat-temperature") as HTMLInputElement | null;
+    const tempValue = document.getElementById("chat-temperature-display");
     if (tempSlider && tempValue) {
         tempSlider.addEventListener("input", () => {
             tempValue.textContent = tempSlider.value;

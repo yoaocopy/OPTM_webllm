@@ -75,9 +75,10 @@
               <p id="message-out" class="hidden"></p>
               <p id="chat-stats" class="hidden"></p>
             
+              <!-- Sampling temperature: shared by local WebLLM and API mode (read in webllm.ts via getUiTemperature()). -->
               <div id="temperature-control" style="margin-bottom: 8px; display: none;">
-                <label for="api-temperature">Temperature: <span id="temperature-value" style="display: inline-block; width: 2.5em; text-align: right;">0.7</span></label>
-                <input type="range" id="api-temperature" min="0" max="2" step="0.1" value="0.7" style="width: 200px;">
+                <label for="chat-temperature">Temperature: <span id="chat-temperature-display" style="display: inline-block; width: 2.5em; text-align: right;">1.0</span></label>
+                <input type="range" id="chat-temperature" min="0" max="2" step="0.1" value="1.0" style="width: 200px;">
               <div style="font-size: 10pt; color: #888; margin-top: 4px;">
                 (Higher temperature increases response randomness.)
               </div>
