@@ -31,7 +31,7 @@ jobs:
       # # Hide API config panel on UI (still keeps mode toggle)
       # API_HIDE_API_PANEL: ${{ inputs.api_hide_api_panel || 'false' }}
 
-      SINGLE_MODE: 'api' # 'local' or 'api' or ''; empty means allow the switching of the two modes；The method for passing this value is also determined by API_INJECT_TARGET.
+      SINGLE_MODE: 'local' # 'local' or 'api' or ''; empty means allow the switching of the two modes；The method for passing this value is also determined by API_INJECT_TARGET.
       INJECT_API_CONFIG: 'true'         # whether to inject API information here
       API_INJECT_TARGET: 'define'   # or 'window'; 'define' means information injected to js, 'window' means injected to html source file with windowVars
       API_BASE_URL: 'https://dive.cs.cityu.edu.hk/ai-test/v1'
