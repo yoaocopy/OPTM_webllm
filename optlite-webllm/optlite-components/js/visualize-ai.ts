@@ -78,7 +78,7 @@ function setPanelVisibility(getMode: () => string) {
   }
 
   const inAiDisplay = getMode() === "ai_display";
-  panel.style.display = inAiDisplay ? "block" : "none";
+  panel.style.display = inAiDisplay && hasFrontendError() ? "block" : "none";
   askButton.style.display = shouldShowAskButton(getMode) ? "inline-block" : "none";
 
   if (!inAiDisplay) {
