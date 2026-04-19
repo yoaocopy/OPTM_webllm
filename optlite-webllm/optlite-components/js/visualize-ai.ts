@@ -30,8 +30,6 @@ function formatAIResponse(text: string): string {
   }
   text = text.replace(/(<\/think>)/gi, "\n$1");
   text = text.replace(/(<\/?(?:think|final)>)/gi, "$1\n");
-  // Avoid accidental single leading spaces after line breaks in rendered output.
-  text = text.replace(/\n /g, "\n");
   return text;
 }
 
@@ -174,7 +172,7 @@ async function sendAskAI(question: string) {
 
     console.log("[VisualizeAI] Raw model response:", finalMessage);
     
-    output.innerText = "AI Response:\n" + finalMessage.replace(/\?/g, '?\n');
+    output.innerText = "AI Response:\n" + formatAIResponse(finalMessage).replace(/\?/g, '?\n');
     if (usage && usage.prompt_tokens && usage.extra) {
       stats.classList.remove("hidden");
       stats.textContent =
