@@ -17,13 +17,14 @@ export default {
     ],
     plugins: [
         ignore(["fs", "path", "crypto"]),
+        // rpt2 must run before node-resolve so extensionless imports (e.g. `./service_worker`) resolve to `.ts`.
+        typescript({
+            rollupCommonJSResolveHack: true,
+            clean: true,
+        }),
         nodeResolve({ browser: true }),
         commonjs({
             ignoreDynamicRequires: true,
         }),
-        typescript({
-            rollupCommonJSResolveHack: false,
-            clean: true
-        })
     ]
 };

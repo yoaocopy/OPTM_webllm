@@ -71,13 +71,14 @@ jobs:
         cd optlite-webllm/webllm-components
         export HUSKY=0
         export HUSKY_SKIP_HOOKS=1
-        npm install --ignore-scripts
-        npm install --save-dev rollup@2.56.2
+        # npm ci + committed lockfile avoids “same package.json, different transitive deps over time”
+        npm ci --ignore-scripts
         chmod +x cleanup-index-js.sh
         chmod +x node_modules/.bin/rollup
         export PATH="$PATH:$(npm bin)"
-        npm run build || true
-        
+        npm run build
+        test -f lib/index.js
+
     - name: Build Python wheel
       run: |
         cd optlite-webllm/optlite-components
