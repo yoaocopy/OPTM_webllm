@@ -34,7 +34,7 @@ function formatAIResponse(text: string): string {
 }
 
 function setStatusText(text: string, visible: boolean = true): void {
-  const status = getEl<HTMLElement>("viz-download-status");
+  const status = getEl<HTMLElement>("download-status");
   if (!status) {
     return;
   }
