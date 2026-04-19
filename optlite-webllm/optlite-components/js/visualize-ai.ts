@@ -24,9 +24,16 @@ function getEl<T extends HTMLElement>(id: string): T | null {
   return document.getElementById(id) as T | null;
 }
 
+function getCurrentErrorText(): string {
+  const visualizerError = (getEl<HTMLElement>("errorOutput")?.textContent || "").trim();
+  if (visualizerError) {
+    return visualizerError;
+  }
+  return (getEl<HTMLElement>("frontendErrorOutput")?.textContent || "").trim();
+}
+
 function hasFrontendError(): boolean {
-  const errorOutput = getEl<HTMLElement>("frontendErrorOutput");
-  return !!errorOutput && (errorOutput.textContent || "").trim() !== "";
+  return getCurrentErrorText() !== "";
 }
 
 function shouldShowAskButton(getMode: () => string): boolean {
@@ -155,9 +162,8 @@ export function initVisualizeAI(params: VisualizeAIInitParams) {
   const modelSelection = getEl<HTMLSelectElement>("viz-model-selection");
   const downloadBtn = getEl<HTMLButtonElement>("viz-download");
   const askAIButton = getEl<HTMLButtonElement>("viz-ask-ai");
-  const frontendErrorOutput = getEl<HTMLElement>("frontendErrorOutput");
 
-  if (!modelSelection || !downloadBtn || !askAIButton || !frontendErrorOutput) {
+  if (!modelSelection || !downloadBtn || !askAIButton) {
     return;
   }
 
@@ -189,7 +195,7 @@ export function initVisualizeAI(params: VisualizeAIInitParams) {
 
   askAIButton.addEventListener("click", () => {
     const code = params.getCode();
-    const errorText = (frontendErrorOutput.textContent || "").trim();
+    const errorText = getCurrentErrorText();
     const question = buildQuestion(code, errorText);
     sendAskAI(question);
   });
@@ -197,7 +203,7 @@ export function initVisualizeAI(params: VisualizeAIInitParams) {
   const observer = new MutationObserver(() => {
     setPanelVisibility(params.getMode);
   });
-  observer.observe(frontendErrorOutput, { childList: true, characterData: true, subtree: true });
+  observer.observe(document.body, { childList: true, characterData: true, subtree: true });
 
   window.addEventListener("hashchange", () => {
     setPanelVisibility(params.getMode);
