@@ -116,13 +116,17 @@
                 </div>
               </div>
 
-           
-              <p class="local-only">Step 1: Initialize WebLLM and Download Model</p>
+              <!-- Temporarily hide step 1 and Pull Model button for local mode, but cannot delete, since webllm.ts needs to bind to the button-->
+    
+              <!-- <p class="local-only">Step 1: Initialize WebLLM and Download Model</p> -->
+    
               <!-- Local-only controls; hidden when API mode is enabled -->
               <div class="download-container local-only">
                 <select id="model-selection" style="display: none;"></select>
-                <button id="download">Pull Model</button>
+                <!-- Restore: remove style="display:none" to show Pull Model again -->
+                <button id="download" type="button" style="display: none;">Pull Model</button> 
               </div>
+            
               <p id="download-status" class="hidden"></p>
 
           
