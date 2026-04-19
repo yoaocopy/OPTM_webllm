@@ -30,6 +30,8 @@ function formatAIResponse(text: string): string {
   }
   text = text.replace(/(<\/think>)/gi, "\n$1");
   text = text.replace(/(<\/?(?:think|final)>)/gi, "$1\n");
+  // Avoid accidental single leading spaces after line breaks in rendered output.
+  text = text.replace(/\n /g, "\n");
   return text;
 }
 
@@ -45,6 +47,14 @@ function setStatusText(text: string, visible: boolean = true): void {
     status.classList.add("hidden");
   }
 }
+
+function updateEngineInitProgressCallback(report: any): void {
+  if (report && report.text) {
+    setStatusText(report.text);
+  }
+}
+
+engine.setInitProgressCallback(updateEngineInitProgressCallback);
 
 function getCurrentErrorText(): string {
   const visualizerError = (getEl<HTMLElement>("errorOutput")?.textContent || "").trim();
@@ -101,7 +111,6 @@ async function initializeWebLLMEngine() {
       top_p: 1,
     } as any);
     isEngineReady = true;
-    setStatusText("Model ready.");
   } catch (err) {
     isEngineReady = false;
     setStatusText("Model load failed.");

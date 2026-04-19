@@ -107,6 +107,10 @@ table#pyOutputPane {
   font-size: 0.75rem;
 }
 
+#visualize-ai-panel .hidden {
+  display: none;
+}
+
 button.smallBtn {
   font-size: 10pt;
   padding: 3px;
