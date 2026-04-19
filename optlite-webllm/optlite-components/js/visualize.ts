@@ -682,7 +682,12 @@ $(document).ready(function () {
 
   var optFrontend = new OptFrontendWithTestcases(params);
   initVisualizeAI({
-    getCode: () => optFrontend.pyInputGetValue(),
+    getCode: () => {
+      const vizCode = (optFrontend.myVisualizer as any)?.curInputCode;
+      return (typeof vizCode === "string" && vizCode.length > 0)
+        ? vizCode
+        : optFrontend.pyInputGetValue();
+    },
     getMode: () => optFrontend.appMode,
   });
 
