@@ -23,6 +23,8 @@
               <% for (var css in htmlWebpackPlugin.files.css) { %>
                 <link href="<%= htmlWebpackPlugin.files.css[css] %>" rel="stylesheet">
                 <% } %>
+              <!-- TEMP_HIDE_TEMPERATURE: delete this comment + the next line to show the slider again (Ask AI unchanged) -->
+              <style>#temperature-control{display:none!important}</style>
     </head>
 
     <body>
@@ -76,12 +78,32 @@
               <p id="chat-stats" class="hidden"></p>
             
               <!-- Sampling temperature: shared by local WebLLM and API (getUiTemperature()); default 0.75, max 1.5. -->
+               
+               <!-- Note: #temperature-control is hidden by default due to <style>#temperature-control{display:none!important}</style> near the top of this file.
+                    To show the temperature slider, modify or remove that style rule. -->
+     
               <div id="temperature-control" style="margin-bottom: 8px; display: none;">
-                <label for="chat-temperature">Temperature: <span id="chat-temperature-display" style="display: inline-block; width: 2.5em; text-align: right;">0.75</span></label>
-                <input type="range" id="chat-temperature" min="0" max="1.5" step="0.05" value="0.75" style="width: 200px;">
-              <div style="font-size: 10pt; color: #888; margin-top: 4px;">
-                (Higher temperature increases the diversity of generated responses.)
+                <label for="chat-temperature">
+                  Temperature:
+                  <span
+                    id="chat-temperature-display"
+                    style="display: inline-block; width: 2.5em; text-align: right;"
+                  >0.75</span>
+                </label>
+                <input
+                  type="range"
+                  id="chat-temperature"
+                  min="0"
+                  max="1.5"
+                  step="0.05"
+                  value="0.75"
+                  style="width: 200px;"
+                >
+                <div style="font-size: 10pt; color: #888; margin-top: 4px;">
+                  (Higher temperature increases the diversity of generated responses.)
+                </div>
               </div>
+ 
               </div>
               <button id="askAI" disabled>Ask AI</button>
 
