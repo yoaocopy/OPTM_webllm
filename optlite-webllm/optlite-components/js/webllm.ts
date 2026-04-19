@@ -109,11 +109,21 @@ engine.setInitProgressCallback(updateEngineInitProgressCallback);
 // Track if the local WebLLM engine has finished loading a model
 let isEngineReady = false;
 
-/** Reads #chat-temperature (local + API); fallback matches live.html default. */
+/** Max new tokens per reply (reload + local/API chat). Lower to shorten outputs when sampling is noisy. */
+const CHAT_MAX_OUTPUT_TOKENS = 512;
+
+/** Qwen-style stop strings (same for reload, local chat, and API). */
+const CHAT_STOP_SEQUENCES = ["<|endoftext|>", "<|im_end|>"];
+
+const CHAT_TEMP_MIN = 0;
+const CHAT_TEMP_MAX = 1.5;
+
+/** Reads #chat-temperature (local + API); clamps to [CHAT_TEMP_MIN, CHAT_TEMP_MAX]; fallback matches live.html. */
 function getUiTemperature(): number {
     const el = document.getElementById("chat-temperature") as HTMLInputElement | null;
-    const n = parseFloat((el?.value ?? "").trim() || "1");
-    return Number.isFinite(n) ? n : 1.0;
+    const raw = parseFloat((el?.value ?? "").trim() || "0.75");
+    const n = Number.isFinite(raw) ? raw : 0.75;
+    return Math.min(CHAT_TEMP_MAX, Math.max(CHAT_TEMP_MIN, n));
 }
 
 async function initializeWebLLMEngine() {
@@ -124,8 +134,8 @@ async function initializeWebLLMEngine() {
     const config = {
         temperature: getUiTemperature(),
         top_p: 1,
-        max_tokens: 512,
-        stop: ["<|endoftext|>", "<|im_end|>"]
+        max_tokens: CHAT_MAX_OUTPUT_TOKENS,
+        stop: CHAT_STOP_SEQUENCES,
     };
     await engine.reload(selectedModel, config);
     // Mark engine as ready after successful reload
@@ -163,10 +173,8 @@ async function callOpenAIAPI(messages, onUpdate, onFinish, onError) {
                 stream: true,
                 temperature: getUiTemperature(),
                 top_p: 1,
-                // Constrain generation to avoid endless outputs
-                max_tokens: 512,
-                // Qwen2 stop strings (aligned with qwen2/chatml template)
-                stop: ["<|endoftext|>", "<|im_end|>"]
+                max_tokens: CHAT_MAX_OUTPUT_TOKENS,
+                stop: CHAT_STOP_SEQUENCES,
             }),
             signal: abortController.signal
         });
@@ -268,6 +276,9 @@ async function streamingGenerating(messages, onUpdate, onFinish, onError) {
             stream: true,
             messages,
             temperature: getUiTemperature(),
+            top_p: 1,
+            max_tokens: CHAT_MAX_OUTPUT_TOKENS,
+            stop: CHAT_STOP_SEQUENCES,
             stream_options: { include_usage: true },
         });
         for await (const chunk of completion) {

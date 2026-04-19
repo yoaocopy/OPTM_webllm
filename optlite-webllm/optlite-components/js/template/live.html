@@ -75,12 +75,12 @@
               <p id="message-out" class="hidden"></p>
               <p id="chat-stats" class="hidden"></p>
             
-              <!-- Sampling temperature: shared by local WebLLM and API mode (read in webllm.ts via getUiTemperature()). -->
+              <!-- Sampling temperature: shared by local WebLLM and API (getUiTemperature()); default 0.75, max 1.5. -->
               <div id="temperature-control" style="margin-bottom: 8px; display: none;">
-                <label for="chat-temperature">Temperature: <span id="chat-temperature-display" style="display: inline-block; width: 2.5em; text-align: right;">1.0</span></label>
-                <input type="range" id="chat-temperature" min="0" max="2" step="0.1" value="1.0" style="width: 200px;">
+                <label for="chat-temperature">Temperature: <span id="chat-temperature-display" style="display: inline-block; width: 2.5em; text-align: right;">0.75</span></label>
+                <input type="range" id="chat-temperature" min="0" max="1.5" step="0.05" value="0.75" style="width: 200px;">
               <div style="font-size: 10pt; color: #888; margin-top: 4px;">
-                (Higher temperature increases response randomness.)
+                (Higher temperature increases the diversity of generated responses.)
               </div>
               </div>
               <button id="askAI" disabled>Ask AI</button>
