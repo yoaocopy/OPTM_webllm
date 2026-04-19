@@ -29,6 +29,10 @@ function hasFrontendError(): boolean {
   return !!errorOutput && (errorOutput.textContent || "").trim() !== "";
 }
 
+function shouldShowAskButton(getMode: () => string): boolean {
+  return getMode() === "ai_display" && isEngineReady && hasFrontendError();
+}
+
 function setPanelVisibility(getMode: () => string) {
   const panel = getEl<HTMLElement>("visualize-ai-panel");
   const askButton = getEl<HTMLButtonElement>("viz-ask-ai");
@@ -38,7 +42,7 @@ function setPanelVisibility(getMode: () => string) {
 
   const inAiDisplay = getMode() === "ai_display";
   panel.style.display = inAiDisplay ? "block" : "none";
-  askButton.style.display = inAiDisplay && hasFrontendError() ? "inline-block" : "none";
+  askButton.style.display = shouldShowAskButton(getMode) ? "inline-block" : "none";
 
   if (!inAiDisplay) {
     const msg = getEl<HTMLElement>("viz-message-out");
@@ -64,12 +68,18 @@ async function initializeWebLLMEngine() {
   status.classList.remove("hidden");
   status.textContent = "Loading local model ...";
   selectedModel = modelSelect.value;
-  await engine.reload(selectedModel, {
-    temperature: 0.75,
-    top_p: 1,
-  } as any);
-  isEngineReady = true;
-  status.textContent = "Model ready.";
+  try {
+    await engine.reload(selectedModel, {
+      temperature: 0.75,
+      top_p: 1,
+    } as any);
+    isEngineReady = true;
+    status.textContent = "Model ready.";
+  } catch (err) {
+    isEngineReady = false;
+    status.textContent = "Model load failed. Please retry Pull Model.";
+    throw err;
+  }
 }
 
 function buildQuestion(code: string, frontendError: string): string {
@@ -158,12 +168,22 @@ export function initVisualizeAI(params: VisualizeAIInitParams) {
     option.textContent = modelId;
     modelSelection.appendChild(option);
   });
+  if (availableModels.length > 0) {
+    selectedModel = availableModels[0];
+  }
   modelSelection.value = selectedModel;
+  if (availableModels.length <= 1) {
+    modelSelection.style.display = "none";
+  }
 
   askAIButton.disabled = true;
   downloadBtn.addEventListener("click", () => {
     initializeWebLLMEngine().then(() => {
       askAIButton.disabled = false;
+      setPanelVisibility(params.getMode);
+    }).catch(() => {
+      askAIButton.disabled = true;
+      setPanelVisibility(params.getMode);
     });
   });
 
@@ -182,6 +202,17 @@ export function initVisualizeAI(params: VisualizeAIInitParams) {
   window.addEventListener("hashchange", () => {
     setPanelVisibility(params.getMode);
   });
+
+  // Mimic single-model live behavior: auto-load local model on init.
+  if (availableModels.length > 0) {
+    initializeWebLLMEngine().then(() => {
+      askAIButton.disabled = false;
+      setPanelVisibility(params.getMode);
+    }).catch(() => {
+      askAIButton.disabled = true;
+      setPanelVisibility(params.getMode);
+    });
+  }
 
   setPanelVisibility(params.getMode);
 }
