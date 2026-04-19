@@ -67,7 +67,8 @@ function sanitizeURL(s) {
 export class OptFrontend extends AbstractBaseFrontend {
   originFrontendJsFile: string = 'opt-frontend.js';
   pyInputAceEditor = undefined; // Ace editor object that contains the user's code
-  preferredDisplayMode: string = 'display';
+  // preferredDisplayMode: string = 'display';
+  preferredDisplayMode: string = 'ai_display';
 
   // some subclasses use these, so put them in the superclass
   activateSyntaxErrorSurvey: boolean = true;
@@ -776,7 +777,9 @@ export class OptFrontend extends AbstractBaseFrontend {
       queryStrOptions.appMode == 'ai_display' ||
       queryStrOptions.appMode == 'visualize' /* deprecated */) &&
       queryStrOptions.preseededCode /* jump to 'display' mode only with preseeded code */) {
-      this.preferredDisplayMode = queryStrOptions.appMode == 'ai_display' ? 'ai_display' : 'display';
+      //this.preferredDisplayMode = queryStrOptions.appMode == 'ai_display' ? 'ai_display' : 'display';
+      this.preferredDisplayMode = 'ai_display'; // always use "ai_display" even when "mode=display" is used in the url
+
       this.executeCode(this.preseededCurInstr); // will switch to 'display' mode
     }
     $.bbq.removeState(); // clean up the URL no matter what
