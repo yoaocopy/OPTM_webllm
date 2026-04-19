@@ -661,10 +661,11 @@ export class OptFrontend extends AbstractBaseFrontend {
     return false; // to prevent default "a href" click action
   }
 
-  // Open visualize.html with current state (reverse of openLiveModeUrl)
+  // Open visualize.html with current state (reverse of openLiveModeUrl).
+  // index.html is the live build default; the visualize chunk is visualize.html.
   openVisualizeUrl() {
     var myArgs = this.getAppState();
-    var urlStr = $.param.fragment('index.html', myArgs, 2 /* clobber all */);
+    var urlStr = $.param.fragment('visualize.html', myArgs, 2 /* clobber all */);
     window.open(urlStr);
     return false;
   }
