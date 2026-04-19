@@ -24,6 +24,28 @@ function getEl<T extends HTMLElement>(id: string): T | null {
   return document.getElementById(id) as T | null;
 }
 
+function formatAIResponse(text: string): string {
+  if (!text) {
+    return "";
+  }
+  text = text.replace(/(<\/think>)/gi, "\n$1");
+  text = text.replace(/(<\/?(?:think|final)>)/gi, "$1\n");
+  return text;
+}
+
+function setStatusText(text: string, visible: boolean = true): void {
+  const status = getEl<HTMLElement>("viz-download-status");
+  if (!status) {
+    return;
+  }
+  status.textContent = text;
+  if (visible) {
+    status.classList.remove("hidden");
+  } else {
+    status.classList.add("hidden");
+  }
+}
+
 function getCurrentErrorText(): string {
   const visualizerError = (getEl<HTMLElement>("errorOutput")?.textContent || "").trim();
   if (visualizerError) {
@@ -66,14 +88,12 @@ function setPanelVisibility(getMode: () => string) {
 }
 
 async function initializeWebLLMEngine() {
-  const status = getEl<HTMLElement>("viz-download-status");
   const modelSelect = getEl<HTMLSelectElement>("viz-model-selection");
-  if (!status || !modelSelect) {
+  if (!modelSelect) {
     return;
   }
 
-  status.classList.remove("hidden");
-  status.textContent = "Loading local model ...";
+  setStatusText("Loading local model ...");
   selectedModel = modelSelect.value;
   try {
     await engine.reload(selectedModel, {
@@ -81,10 +101,10 @@ async function initializeWebLLMEngine() {
       top_p: 1,
     } as any);
     isEngineReady = true;
-    status.textContent = "Model ready.";
+    setStatusText("Model ready.");
   } catch (err) {
     isEngineReady = false;
-    status.textContent = "Model load failed. Please retry Pull Model.";
+    setStatusText("Model load failed.");
     throw err;
   }
 }
@@ -104,7 +124,7 @@ async function sendAskAI(question: string) {
 
   if (!isEngineReady) {
     output.classList.remove("hidden");
-    output.textContent = "Please pull a local model first.";
+    output.innerText = "Local model is still loading. Please wait.";
     return;
   }
 
@@ -114,7 +134,7 @@ async function sendAskAI(question: string) {
   console.log("[VisualizeAI] Messages before sending:", JSON.parse(JSON.stringify(messages)));
   
   output.classList.remove("hidden");
-  output.textContent = "AI is thinking...";
+  output.innerText = "AI is thinking...";
   stats.classList.add("hidden");
   stats.textContent = "";
 
@@ -138,14 +158,14 @@ async function sendAskAI(question: string) {
       if (chunk.usage) {
         usage = chunk.usage;
       }
-      output.textContent = "AI Response:\n" + curMessage;
+      output.innerText = "AI Response:\n" + formatAIResponse(curMessage).replace(/\?/g, '?\n');
     }
 
     const finalMessage = await engine.getMessage();
 
     console.log("[VisualizeAI] Raw model response:", finalMessage);
     
-    output.textContent = "AI Response:\n" + finalMessage;
+    output.innerText = "AI Response:\n" + finalMessage.replace(/\?/g, '?\n');
     if (usage && usage.prompt_tokens && usage.extra) {
       stats.classList.remove("hidden");
       stats.textContent =
@@ -154,7 +174,7 @@ async function sendAskAI(question: string) {
         `decoding: ${usage.extra.decode_tokens_per_s.toFixed(4)} tokens/sec`;
     }
   } catch (err) {
-    output.textContent = "Error: " + String(err);
+    output.innerText = "Error: " + String(err);
   }
 }
 
@@ -183,15 +203,6 @@ export function initVisualizeAI(params: VisualizeAIInitParams) {
   }
 
   askAIButton.disabled = true;
-  downloadBtn.addEventListener("click", () => {
-    initializeWebLLMEngine().then(() => {
-      askAIButton.disabled = false;
-      setPanelVisibility(params.getMode);
-    }).catch(() => {
-      askAIButton.disabled = true;
-      setPanelVisibility(params.getMode);
-    });
-  });
 
   askAIButton.addEventListener("click", () => {
     const code = params.getCode();
@@ -211,6 +222,7 @@ export function initVisualizeAI(params: VisualizeAIInitParams) {
 
   // Mimic single-model live behavior: auto-load local model on init.
   if (availableModels.length > 0) {
+    setStatusText("Initializing local model ...");
     initializeWebLLMEngine().then(() => {
       askAIButton.disabled = false;
       setPanelVisibility(params.getMode);
