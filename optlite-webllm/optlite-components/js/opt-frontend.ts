@@ -67,6 +67,7 @@ function sanitizeURL(s) {
 export class OptFrontend extends AbstractBaseFrontend {
   originFrontendJsFile: string = 'opt-frontend.js';
   pyInputAceEditor = undefined; // Ace editor object that contains the user's code
+  preferredDisplayMode: string = 'display';
 
   // some subclasses use these, so put them in the superclass
   activateSyntaxErrorSurvey: boolean = true;
@@ -558,7 +559,7 @@ export class OptFrontend extends AbstractBaseFrontend {
   }
 
   enterDisplayMode() {
-    this.updateAppDisplay('display');
+    this.updateAppDisplay(this.preferredDisplayMode);
   }
 
   enterEditMode() {
@@ -598,9 +599,10 @@ export class OptFrontend extends AbstractBaseFrontend {
       if (typeof codeopticonSession !== "undefined") { s.cosession = codeopticonSession; }
       if (typeof codeopticonUsername !== "undefined") { s.couser = codeopticonUsername; }
       $.bbq.pushState(s, 2 /* completely override other hash strings to keep URL clean */);
-    } else if (this.appMode == 'display' || this.appMode == 'visualize' /* 'visualize' is deprecated */) {
+    } else if (this.appMode == 'display' || this.appMode == 'visualize' || this.appMode == 'ai_display' /* 'visualize' is deprecated */) {
       assert(this.myVisualizer);
-      this.appMode = 'display'; // canonicalize
+      this.appMode = (this.appMode == 'ai_display') ? 'ai_display' : 'display'; // canonicalize
+      this.preferredDisplayMode = this.appMode;
 
       $("#pyInputPane").hide();
       $("#pyOutputPane,#embedLinkDiv").show();
@@ -638,7 +640,7 @@ export class OptFrontend extends AbstractBaseFrontend {
 
       $(document).scrollTop(0); // scroll to top to make UX better on small monitors
 
-      var s: any = { mode: 'display' };
+      var s: any = { mode: this.appMode };
       // keep these persistent so that they survive page reloads
       if (typeof codeopticonSession !== "undefined") { s.cosession = codeopticonSession; }
       if (typeof codeopticonUsername !== "undefined") { s.couser = codeopticonUsername; }
@@ -651,7 +653,7 @@ export class OptFrontend extends AbstractBaseFrontend {
 
     // log at the end after appMode gets canonicalized
     this.logEventCodeopticon({ type: 'updateAppDisplay', mode: this.appMode, appState: this.getAppState() });
-    assert(this.appMode === 'edit' || this.appMode === 'display'); // postcondition
+    assert(this.appMode === 'edit' || this.appMode === 'display' || this.appMode === 'ai_display'); // postcondition
   }
 
   openLiveModeUrl() {
@@ -771,8 +773,10 @@ export class OptFrontend extends AbstractBaseFrontend {
     }
 
     if ((queryStrOptions.appMode == 'display' ||
+      queryStrOptions.appMode == 'ai_display' ||
       queryStrOptions.appMode == 'visualize' /* deprecated */) &&
       queryStrOptions.preseededCode /* jump to 'display' mode only with preseeded code */) {
+      this.preferredDisplayMode = queryStrOptions.appMode == 'ai_display' ? 'ai_display' : 'display';
       this.executeCode(this.preseededCurInstr); // will switch to 'display' mode
     }
     $.bbq.removeState(); // clean up the URL no matter what

@@ -5,6 +5,7 @@
 import { assert, htmlspecialchars } from './pytutor';
 import { OptTestcases, redSadFace, yellowHappyFace } from './opt-testcases';
 import { OptFrontend } from './opt-frontend';
+import { initVisualizeAI } from './visualize-ai';
 require('./lib/jquery-3.0.0.min.js');
 require('./lib/jquery.qtip.js');
 require('../css/jquery.qtip.css');
@@ -680,6 +681,10 @@ $(document).ready(function () {
   }
 
   var optFrontend = new OptFrontendWithTestcases(params);
+  initVisualizeAI({
+    getCode: () => optFrontend.pyInputGetValue(),
+    getMode: () => optFrontend.appMode,
+  });
 
   (window as any).optFrontend = optFrontend; // purposely leak to globals to ease debugging!!!
 

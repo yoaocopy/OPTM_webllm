@@ -55,6 +55,19 @@
   </div>
 
   <div id="pyOutputPane"></div>
+  <div id="visualize-ai-panel" style="display: none; margin-top: 12px; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+    <div style="margin-bottom: 8px; font-weight: bold;">AI Assistant (Local)</div>
+    <div style="margin-bottom: 8px;">
+      <select id="viz-model-selection" style="max-width: 100%;"></select>
+      <button id="viz-download" type="button">Pull Model</button>
+      <span id="viz-download-status" class="hidden" style="margin-left: 6px;"></span>
+    </div>
+    <div style="margin-bottom: 8px;">
+      <button id="viz-ask-ai" type="button" style="display: none;">Ask AI</button>
+    </div>
+    <p id="viz-message-out" class="hidden"></p>
+    <p id="viz-chat-stats" class="hidden"></p>
+  </div>
 
   <% if (htmlWebpackPlugin.options.unsupportedBrowser) { %>
     <style>.unsupported-browser { display: none; }</style>
