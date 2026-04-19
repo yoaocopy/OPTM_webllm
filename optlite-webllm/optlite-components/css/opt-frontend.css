@@ -101,6 +101,12 @@ table#pyOutputPane {
   color: blue;
 }
 
+#visualize-ai-panel #viz-chat-stats {
+  background-color: #d3eceb;
+  padding: 10px;
+  font-size: 0.75rem;
+}
+
 button.smallBtn {
   font-size: 10pt;
   padding: 3px;
