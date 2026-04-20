@@ -16,62 +16,17 @@ self.onmessage = async (event) => {
       const indexURL = pyodideScript.replace(/\/[^/]*$/, "/");
       self.pyodide = await loadPyodide({ indexURL });
       await self.pyodide.loadPackage("micropip");
-      // Do not use pydoc.render_doc inside user scripts: PGLogger (bdb) assumes f_globals['__name__'] on every
-      // frame and breaks on pydoc's deep stack (KeyError '__name__', IndexError on bdb stack).
-      // inspect.getdoc/signature matches normal __doc__ for builtins without running pydoc.
       // fetch and install optlite from pypi
       results = await self.pyodide.runPythonAsync(`
-      import builtins
       import micropip
-      import types
       from js import packages, optlite
       await micropip.install(optlite)
       for p in packages:
           await micropip.install(p)
-      _helper_mod = types.ModuleType("optlite_help")
-      exec("""
-import inspect
-def help(*args, **kwargs):
-    if not args:
-        print("Type help(object) for help about object.")
-        return
-    obj = args[0]
-    name = getattr(obj, "__name__", None) or type(obj).__name__
-    parts = ["Help on " + name + ":"]
-    try:
-        parts.append(str(inspect.signature(obj)))
-    except (TypeError, ValueError):
-        pass
-    doc = inspect.getdoc(obj)
-    parts.append(doc if doc else "No documentation string.")
-    print("\\n\\n".join(parts))
-""", _helper_mod.__dict__)
-      builtins.help = _helper_mod.help
       `)
     } else { // visualize code
       await self.pyodide.loadPackagesFromImports(self.script);
       results = await self.pyodide.runPythonAsync(`
-      import builtins
-      import types
-      _helper_mod = types.ModuleType("optlite_help")
-      exec("""
-import inspect
-def help(*args, **kwargs):
-    if not args:
-        print("Type help(object) for help about object.")
-        return
-    obj = args[0]
-    name = getattr(obj, "__name__", None) or type(obj).__name__
-    parts = ["Help on " + name + ":"]
-    try:
-        parts.append(str(inspect.signature(obj)))
-    except (TypeError, ValueError):
-        pass
-    doc = inspect.getdoc(obj)
-    parts.append(doc if doc else "No documentation string.")
-    print("\\n\\n".join(parts))
-""", _helper_mod.__dict__)
-      builtins.help = _helper_mod.help
       import optlite
       from js import script, rawInputLst
       optlite.exec_script(script, rawInputLst)
