@@ -17,7 +17,8 @@ self.onmessage = async (event) => {
       self.pyodide = await loadPyodide({ indexURL });
       await self.pyodide.loadPackage("micropip");
       // In the 0.27.3 lockfile, package key is "pydoc-data" (import name is still pydoc_data).
-      // await self.pyodide.loadPackage("pydoc-data");
+      // pydoc-data is not necessary for help(list), but need to add import pydoc_data for help('for') if self.pyodide.loadPackage("pydoc-data") is not used
+      // await self.pyodide.loadPackage("pydoc-data"); 
       // fetch and install optlite from pypi
       results = await self.pyodide.runPythonAsync(`
       import micropip
