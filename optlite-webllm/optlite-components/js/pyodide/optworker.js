@@ -15,7 +15,7 @@ self.onmessage = async (event) => {
       importScripts(pyodideScript);
       const indexURL = pyodideScript.replace(/\/[^/]*$/, "/");
       self.pyodide = await loadPyodide({ indexURL });
-      // await self.pyodide.loadPackage("micropip");
+      await self.pyodide.loadPackage("micropip");
       // In the 0.27.3 lockfile, package key is "pydoc-data" (import name is still pydoc_data).
       // await self.pyodide.loadPackage("pydoc-data");
       // fetch and install optlite from pypi
