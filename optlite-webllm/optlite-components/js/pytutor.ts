@@ -3322,7 +3322,7 @@ class DataVisualizer {
               tbl.append('<tr></tr>');
             }
 
-            var curTr = tbl.find('tr:last');
+            var curTr = tbl.children('tr:last');
             curTr.append('<td class="setElt"></td>');
             myViz.renderNestedObject(val, stepNum, curTr.children('td:last'));
           });
