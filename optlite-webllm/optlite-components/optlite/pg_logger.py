@@ -269,53 +269,6 @@ def create_banned_builtins_wrapper(fn_name):
     raise Exception("'" + fn_name + "' is not supported by Python Tutor." + TRY_ANACONDA_STR)
   return err_func
 
-def safe_help_wrapper(*args):
-  """
-  Lightweight help() replacement that avoids deep pydoc execution paths.
-  This keeps compatibility with PGLogger tracing while still providing
-  useful docs for builtins and simple keywords.
-  """
-  if not args:
-    print("Type help(object) for help about object.")
-    return
-
-  obj = args[0]
-  if type(obj) is str:
-    key = obj.strip()
-    try:
-      import pydoc_data.topics as _topics
-      keywords = getattr(_topics, 'keywords', {})
-      topics = getattr(_topics, 'topics', {})
-      if key in keywords:
-        topic_name = keywords[key]
-        print(topics.get(topic_name, "No topic text found for keyword: " + key))
-        return
-      if key in topics:
-        print(topics[key])
-        return
-    except Exception:
-      pass
-    print("Sorry, topic and keyword documentation is unavailable.")
-    return
-
-  try:
-    import inspect
-    name = getattr(obj, '__name__', None) or type(obj).__name__
-    parts = ["Help on " + name + ":"]
-    try:
-      parts.append(str(inspect.signature(obj)))
-    except (TypeError, ValueError):
-      pass
-    doc = inspect.getdoc(obj)
-    parts.append(doc if doc else "No documentation string.")
-    print("\n\n".join(parts))
-  except Exception:
-    # If introspection fails, fall back to the original builtin behavior.
-    if type(__builtins__) is dict:
-      __builtins__['help'](*args)
-    else:
-      __builtins__.help(*args)
-
 
 class RawInputException(Exception):
   pass
@@ -781,6 +734,9 @@ class PGLogger(bdb.Bdb):
     def setup(self, f, t):
         self.forget()
         self.stack, self.curindex = self.get_stack(f, t)
+        if not self.stack:
+          self.curframe = None
+          return
         self.curframe = self.stack[self.curindex][0]
 
     # should be a reasonably unique ID to match calls and returns:
@@ -815,7 +771,8 @@ class PGLogger(bdb.Bdb):
         if self.done: return
 
         if self._wait_for_mainpyfile:
-            if ((frame.f_globals['__name__'] not in self.modules_to_trace) or
+            frame_module = frame.f_globals.get('__name__', '')
+            if ((frame_module not in self.modules_to_trace) or
                 frame.f_lineno <= 0):
             # older code:
             #if (self.canonic(frame.f_code.co_filename) != "<string>" or
@@ -860,11 +817,13 @@ class PGLogger(bdb.Bdb):
 
     def interaction(self, frame, traceback, event_type):
         self.setup(frame, traceback)
+        if not self.stack:
+          return
         tos = self.stack[self.curindex]
         top_frame = tos[0]
         lineno = tos[1]
 
-        topframe_module = top_frame.f_globals['__name__']
+        topframe_module = top_frame.f_globals.get('__name__', '')
 
         # debug ...
         '''
@@ -962,7 +921,7 @@ class PGLogger(bdb.Bdb):
           elif event_type == 'return' and self.curindex > 0:
             prev_tos = self.stack[self.curindex - 1]
             prev_topframe = prev_tos[0]
-            prev_topframe_module = prev_topframe.f_globals['__name__']
+            prev_topframe_module = prev_topframe.f_globals.get('__name__', '')
             if prev_topframe_module in self.stdout_by_module:
               sys.stdout = self.stdout_by_module[prev_topframe_module]
             else:
@@ -1478,8 +1437,6 @@ class PGLogger(bdb.Bdb):
             user_builtins[k] = create_banned_builtins_wrapper(k)
           elif k == '__import__' and not self.allow_all_modules:
             user_builtins[k] = __restricted_import__
-          elif k == 'help' and is_python3:
-            user_builtins[k] = safe_help_wrapper
           else:
             if k == 'raw_input':
               user_builtins[k] = raw_input_wrapper
