@@ -14,13 +14,18 @@ self.onmessage = async (event) => {
       importScripts(self.pyodide);
       self.pyodide = await loadPyodide();
       await self.pyodide.loadPackage("micropip");
+      // Builtin types' help() text lives in unvendored stdlib; see Pyodide wasm-constraints (pydoc_data).
+      await self.pyodide.loadPackage("pydoc_data");
+      // help() uses pydoc's pager (less/subprocess); not available in WASM — print to captured stdout instead.
       // fetch and install optlite from pypi
       results = await self.pyodide.runPythonAsync(`
       import micropip
+      import pydoc
       from js import packages, optlite
       await micropip.install(optlite)
       for p in packages:
           await micropip.install(p)
+      pydoc.pager = lambda text: print(text)
       `)
     } else { // visualize code
       await self.pyodide.loadPackagesFromImports(self.script);
