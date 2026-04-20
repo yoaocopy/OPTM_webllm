@@ -1001,7 +1001,7 @@ export class ExecutionVisualizer {
           $.each(obj, function(ind, val) {
             if (ind < '1') return; // skip type tag and ID entry
             contentTr.append('<td class="'+ label + 'Elt"></td>');
-            myViz.renderNestedObject(val, stepNum, contentTr.find('td:last'));
+            myViz.renderNestedObject(val, stepNum, contentTr.children('td:last'));
           });
           contentTr.append('<td class="'+ label + 'LElt">'+'</td>');
         }
@@ -3324,7 +3324,7 @@ class DataVisualizer {
 
             var curTr = tbl.find('tr:last');
             curTr.append('<td class="setElt"></td>');
-            myViz.renderNestedObject(val, stepNum, curTr.find('td:last'));
+            myViz.renderNestedObject(val, stepNum, curTr.children('td:last'));
           });
         }
         else if (obj[0] == 'DICT') {
