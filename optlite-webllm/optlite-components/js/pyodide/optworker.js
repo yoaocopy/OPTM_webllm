@@ -16,39 +16,53 @@ self.onmessage = async (event) => {
       const indexURL = pyodideScript.replace(/\/[^/]*$/, "/");
       self.pyodide = await loadPyodide({ indexURL });
       await self.pyodide.loadPackage("micropip");
-      // Builtin types' help() text lives in unvendored stdlib; see Pyodide wasm-constraints (pydoc_data).
-      await self.pyodide.loadPackage("pydoc_data");
-      // help() uses pydoc's pager (less/subprocess); WASM has no pager — use plain output and a help() that only prints.
+      // Do not use pydoc.render_doc inside user scripts: PGLogger (bdb) assumes f_globals['__name__'] on every
+      // frame and breaks on pydoc's deep stack (KeyError '__name__', IndexError on bdb stack).
+      // inspect.getdoc/signature matches normal __doc__ for builtins without running pydoc.
       // fetch and install optlite from pypi
       results = await self.pyodide.runPythonAsync(`
       import builtins
+      import inspect
       import micropip
-      import pydoc
-      import pydoc_data  # noqa: F401 — ensure topics for builtins resolve
       from js import packages, optlite
       await micropip.install(optlite)
       for p in packages:
           await micropip.install(p)
-      pydoc.pager = pydoc.plainpager
       def _help(*args, **kwargs):
           if not args:
               print("Type help(object) for help about object.")
               return
-          print(pydoc.render_doc(args[0]))
+          obj = args[0]
+          name = getattr(obj, "__name__", None) or type(obj).__name__
+          parts = ["Help on " + name + ":"]
+          try:
+              parts.append(str(inspect.signature(obj)))
+          except (TypeError, ValueError):
+              pass
+          doc = inspect.getdoc(obj)
+          parts.append(doc if doc else "No documentation string.")
+          print("\\n\\n".join(parts))
       builtins.help = _help
       `)
     } else { // visualize code
       await self.pyodide.loadPackagesFromImports(self.script);
       results = await self.pyodide.runPythonAsync(`
       import builtins
-      import pydoc
-      import pydoc_data  # noqa: F401
-      pydoc.pager = pydoc.plainpager
+      import inspect
       def _help(*args, **kwargs):
           if not args:
               print("Type help(object) for help about object.")
               return
-          print(pydoc.render_doc(args[0]))
+          obj = args[0]
+          name = getattr(obj, "__name__", None) or type(obj).__name__
+          parts = ["Help on " + name + ":"]
+          try:
+              parts.append(str(inspect.signature(obj)))
+          except (TypeError, ValueError):
+              pass
+          doc = inspect.getdoc(obj)
+          parts.append(doc if doc else "No documentation string.")
+          print("\\n\\n".join(parts))
       builtins.help = _help
       import optlite
       from js import script, rawInputLst
