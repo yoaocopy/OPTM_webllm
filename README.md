@@ -1,10 +1,14 @@
 # OPT_Mentor
 
-OPT_Mentor is a serverless implementation of Online Python Tutor Lite (OPTLite) designed for offline use and enhanced educational environments. This project builds upon the [optlite](https://github.com/dive4dec/optlite) concept while making it more accessible and secure for educational settings. What's more, it is also integrated with fined-tuned LLM model to provide Socratic hints instead of direct answers (need a server providing LLM access).
+OPT_Mentor is a serverless implementation of Online Python Tutor Lite (OPTLite) designed for offline use and enhanced educational environments. This project builds upon the [optlite](https://github.com/dive4dec/optlite) concept while making it more accessible and secure for educational settings. What's more, it is also integrated with fined-tuned LLM model to provide Socratic hints instead of direct answers (need a server providing LLM access). 
 
-📌 Visit [https://ccha23.github.io/OPTM/](https://ccha23.github.io/OPTM/) to have a try.
+Two modes are possible with slight change of the code:
+- WebLLM mode: the LLM model will be downloaded and run directedly within the browser;
+- API mode: Use a server to provide the LLM with access through an OpenAI-format API.
 
-📌 You can also visit [https://ccha23.github.io/OPTM/live.html](https://ccha23.github.io/OPTM/live.html) directly to try the AI mode.
+📌 Visit [https://ccha23.github.io/OPTM/live.html](https://ccha23.github.io/OPTM/live.html) to try the WebLLM mode.
+
+📌 You can also visit [https://ccha23.github.io/OPTM/live.html](https://ccha23.github.io/OPTM/live.html) directly to try the API mode.
 
 
 ## Features
@@ -14,7 +18,7 @@ OPT_Mentor is a serverless implementation of Online Python Tutor Lite (OPTLite) 
 - **Enhanced Security**: No server-side code execution, reducing security risks
 - **Educational Focus**: Perfect for classroom settings and online exams
 - **Safe Exam Browser Compatible**: Works with [Safe Exam Browser](https://safeexambrowser.org/)
-  > ⚠️ The AI model does not work with Safe Exam Browser at present.
+  > ⚠️ The WebLLM model does not work with Safe Exam Browser at present.
 - **Interactive Visualization**: Visual representation of Python program execution
 - **Live Editing Mode**: Real-time code editing and visualization
 - ✨ **Socratic AI hints**: Provide Socratic style hints instead of answers with the fine-tuned LLM model.
@@ -23,34 +27,35 @@ OPT_Mentor is a serverless implementation of Online Python Tutor Lite (OPTLite) 
 <details open>
 <summary>💡(Click to expand/collapse)</summary>
 
-**Requirement:** To get the Socratic AI hints, a server is needed to provide the LLM access.
+
 
 ➡️ Starting Page
 
-![OPTMentor main page](./screenshots/OPTM_main_page.jpg)
+![OPTMentor main page](./screenshots/OPTMentor_WebLLM_visualization_1.jpg)
 
 After you enter your code:
 
-- The `Visulize` button will navigate you to the page for visualizing the execution.
+- The `Visulize Execution` button will navigate you to the page for visualizing the execution.
 - The `Live Edit` button will navigate you to the page featuring a fine-tuned LLM mode that provides Socratic hints.
 - The `Permalink` button will generate a shareable link.
 
 ➡️ Visualization Mode
-![OPTMentor visualization of excution](./screenshots/OPTM_visualize_display.jpg)
+![OPTMentor visualization of excution](./screenshots/OPTMentor_WebLLM_visualization_2.jpg)
 
 Here you can:
 
 - View the visualization of variables, etc., in the right-hand side area.
 - Inspect the execution step-by-step either by dragging the progress bar or by clicking the `<< First`, `<Prev`, and other buttons.
+- When your code encounters an error, the `Ask AI` button will appear. Clicking on it will provide you with Socratic hints from the AI.
 - Clicking "Edit this code" will navigate you back to the code editing page, where you can also choose to enter the live editing mode.
 
 ➡️ Live Editing Mode with LLM Integrated
 
-![OPTMentor live edit page 2](./screenshots/OPTM_live_edit.jpg)
+![OPTMentor live edit page 2](./screenshots/OPTMentor_WebLLM_live_2.jpg)
 
+- The LLM model will be downloaded (first-time visit) or loaded from cache.
 - When your code encounters an error, the `Ask AI` button will appear. Clicking on it will provide you with Socratic hints from the AI.
-- You can return to the Visualization page (which focuses on execution visualization) using the `Visualize` button below the code box.
-- The `Reset API State` button allows you to clear the cache and refresh the page, simulating a first-time visit.
+- You can return to the Visualization page (which focuses on execution visualization) using the `Visualize Execution` button below the code box.
 
 </details>
 
