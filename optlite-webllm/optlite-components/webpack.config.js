@@ -47,9 +47,9 @@ module.exports = {
       }),
       new HtmlWebpackPlugin({
         filename: "index.html",
-        title: 'Live Python Programming Mode',
-        chunks: ['opt-live'],
-        template: './js/template/live.html',
+        title: 'Visualize Python Code Execution',
+        chunks: ['visualize'],
+        template: './js/template/visualize.html',
         window: windowVars,
       }),
       // Same app as index.html; keeps permalinks and openLiveModeUrl() working as live.html#...
