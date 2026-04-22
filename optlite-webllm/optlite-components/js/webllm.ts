@@ -121,8 +121,8 @@ const CHAT_TEMP_MAX = 1.5;
 /** Reads #chat-temperature (local + API); clamps to [CHAT_TEMP_MIN, CHAT_TEMP_MAX]; fallback matches live.html. */
 function getUiTemperature(): number {
     const el = document.getElementById("chat-temperature") as HTMLInputElement | null;
-    const raw = parseFloat((el?.value ?? "").trim() || "0.75");
-    const n = Number.isFinite(raw) ? raw : 0.75;
+    const raw = parseFloat((el?.value ?? "").trim() || "1.0");
+    const n = Number.isFinite(raw) ? raw : 1.0;
     return Math.min(CHAT_TEMP_MAX, Math.max(CHAT_TEMP_MIN, n));
 }
 

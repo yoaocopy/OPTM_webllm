@@ -105,7 +105,7 @@ async function initializeWebLLMEngine() {
   selectedModel = modelSelect.value;
   try {
     await engine.reload(selectedModel, {
-      temperature: 0.75,
+      temperature: 1.0,
       top_p: 1,
     } as any);
     isEngineReady = true;
@@ -151,7 +151,7 @@ async function sendAskAI(question: string) {
     const completion: any = await engine.chat.completions.create({
       stream: true,
       messages,
-      temperature: 0.75,
+      temperature: 1.0,
       top_p: 1,
       max_tokens: CHAT_MAX_OUTPUT_TOKENS,
       stop: CHAT_STOP_SEQUENCES,
