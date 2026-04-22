@@ -6,9 +6,9 @@ Two modes are possible with slight change of the code:
 - WebLLM mode: the LLM model will be downloaded and run directedly within the browser;
 - API mode: Use a server to provide the LLM with access through an OpenAI-format API.
 
-📌 Visit [https://ccha23.github.io/OPTM/live.html](https://ccha23.github.io/OPTM/live.html) to try the WebLLM mode.
+📌 Visit [https://dive4dec.github.io/OPT_Mentor/](https://dive4dec.github.io/OPT_Mentor/) to try the WebLLM mode.
 
-📌 You can also visit [https://ccha23.github.io/OPTM/live.html](https://ccha23.github.io/OPTM/live.html) directly to try the API mode.
+📌 You can also visit [https://ccha23.github.io/OPTM/](https://ccha23.github.io/OPTM/) directly to try the API mode.
 
 
 ## Features

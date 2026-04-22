@@ -47,6 +47,13 @@ module.exports = {
       }),
       new HtmlWebpackPlugin({
         filename: "index.html",
+
+        // The next three lines configure index.html to live.html
+        // title: 'Live Python Programming Mode',
+        // chunks: ['opt-live'],
+        // template: './js/template/live.html',
+        
+        // The next three lines configure index.html to visualize.html
         title: 'Visualize Python Code Execution',
         chunks: ['visualize'],
         template: './js/template/visualize.html',
