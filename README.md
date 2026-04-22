@@ -53,7 +53,7 @@ Here you can:
 
 ![OPTMentor live edit page 2](./screenshots/OPTMentor_WebLLM_live_2.jpg)
 
-- The LLM model will be downloaded (first-time visit) or loaded from cache.
+- The LLM model will be downloaded at your first visit and cached in the browser. Then it will be loaded from cache for subsequent visits.
 - When your code encounters an error, the `Ask AI` button will appear. Clicking on it will provide you with Socratic hints from the AI.
 - You can return to the Visualization page (which focuses on execution visualization) using the `Visualize Execution` button below the code box.
 
