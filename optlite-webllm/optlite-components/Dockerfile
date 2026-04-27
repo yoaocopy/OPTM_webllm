@@ -35,20 +35,25 @@ ENV PATH="/opt/pyenv/bin:${PATH}"
 # Create working directory
 WORKDIR /app
 
-# Copy source code
+# Copy lockfiles first for better dependency-layer caching.
+COPY webllm-components/package.json webllm-components/package-lock.json /app/webllm-components/
+COPY optlite-components/package.json optlite-components/package-lock.json /app/optlite-components/
+
+# Install Node dependencies before copying full source.
+RUN cd webllm-components && \
+    export HUSKY=0 && \
+    export HUSKY_SKIP_HOOKS=1 && \
+    npm ci --ignore-scripts
+RUN cd optlite-components && npm ci
+
+# Copy full source code.
 COPY . .
 
 # Build webllm-components first (required by optlite-components imports)
 RUN cd webllm-components && \
-    export HUSKY=0 && \
-    export HUSKY_SKIP_HOOKS=1 && \
-    npm ci --ignore-scripts && \
     sed -i 's/\r$//' cleanup-index-js.sh && \
     chmod +x cleanup-index-js.sh && \
     npm run build
-
-# Install Node dependencies for optlite-components
-RUN cd optlite-components && npm install
 
 # Install Python dependencies for wheel build
 RUN cd optlite-components && pip3 install -r optlite/requirements.txt && \
