@@ -3,7 +3,7 @@ FROM ubuntu:24.04
 ARG NODE_MAJOR=22
 
 # Install system dependencies
-RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
+RUN apt-get update && \
     apt-get install -y \
     build-essential \
     ca-certificates \
@@ -15,12 +15,12 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
 
 # Install Node.js (keep current major or higher as required)
 RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_MAJOR}.x | bash - && \
-    DEBIAN_FRONTEND=noninteractive apt-get update && \
+    apt-get update && \
     apt-get install -y nodejs && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Python 3.12 from Ubuntu 24.04 repository
-RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
+RUN apt-get update && \
     apt-get install -y python3.12 python3.12-venv && \
     rm -rf /var/lib/apt/lists/*
 
